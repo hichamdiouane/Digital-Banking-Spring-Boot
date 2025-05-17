@@ -1,0 +1,14 @@
+### GET request to example server
+GET http://localhost:8085/customers
+accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODUiLCJzdWIiOiJ1c2VyMSIsImV4cCI6MTc0NzUwMDYyOCwiaWF0IjoxNzQ3NTAwMDI4LCJzY29wZSI6IlJPTEVfVVNFUiJ9.0ebdu14g9C1dLmu8O9TJpLsJmrwJGri4Si1rRLNXmINmuXqR6bileIctstUI-rCK7u-28ZBPbq5qpZJUFiP5NA
+###
+GET http://localhost:8085/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODUiLCJzdWIiOiJ1c2VyMSIsImV4cCI6MTc0NjMwMDI1NywiaWF0IjoxNzQ2Mjk5NjU3LCJzY29wZSI6IlJPTEVfVVNFUiJ9.qCnJLV-AdnIsIO4vNjGMaAOIyQDwUN7xln2aqBGVxvES4Cl0xgPS0r-Xi2-hy2bveGSB3sSu2Gg1nu2pZPd2YA
+accept: application/json
+
+###
+POST http://localhost:8085/auth/login
+Content-type: application/x-www-form-urlencoded
+
+username=user1&password=1234
