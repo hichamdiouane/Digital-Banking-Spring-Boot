@@ -1,20 +1,27 @@
 package diouane.hicham.ebanking;
 
+import diouane.hicham.ebanking.dtos.BankAccountDTO;
+import diouane.hicham.ebanking.dtos.CurrentBankAccountDTO;
+import diouane.hicham.ebanking.dtos.CustomerDTO;
+import diouane.hicham.ebanking.dtos.SavingBankAccountDTO;
 import diouane.hicham.ebanking.entities.AccountOperation;
 import diouane.hicham.ebanking.entities.CurrentAccount;
 import diouane.hicham.ebanking.entities.Customer;
 import diouane.hicham.ebanking.entities.SavingAccount;
 import diouane.hicham.ebanking.enums.AccountStatus;
 import diouane.hicham.ebanking.enums.OperationType;
+import diouane.hicham.ebanking.exceptions.CustomerNotFoundException;
 import diouane.hicham.ebanking.repositories.AccountOperationRepository;
 import diouane.hicham.ebanking.repositories.BankAccountRepository;
 import diouane.hicham.ebanking.repositories.CustomerRepository;
+import diouane.hicham.ebanking.services.BankAccountService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -25,9 +32,8 @@ public class EBankingApplication {
         SpringApplication.run(EBankingApplication.class, args);
     }
 
-
-
-    @Bean
+    //Tester la couche dao
+    //@Bean
     CommandLineRunner start(CustomerRepository customerRepository,
                             BankAccountRepository bankAccountRepository,
                             AccountOperationRepository accountOperationRepository) {
@@ -67,6 +73,41 @@ public class EBankingApplication {
                     accountOperationRepository.save(accountOperation);
                 }
             });
+        };
+    }
+
+    //Tester la couche service
+    @Bean
+    CommandLineRunner commandLineRunner(BankAccountService bankAccountService) {
+        return args -> {
+            Stream.of("hicham","mohamed","mourad").forEach(name -> {
+                CustomerDTO customerDTO = new CustomerDTO();
+                customerDTO.setName(name);
+                customerDTO.setEmail(name + "@gmail.com");
+                bankAccountService.saveCustomer(customerDTO);
+            });
+            bankAccountService.listCustomers().forEach(c -> {
+                try {
+                    bankAccountService.saveCurrentBankAccount(Math.random()*90000,9000, c.getId());
+                    bankAccountService.saveSavingBankAccount(Math.random()*12000, 5.5, c.getId());
+
+                } catch (CustomerNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            List<BankAccountDTO> bankAccountDTOS = bankAccountService.bankAccountList();
+            for(BankAccountDTO bankAccount:bankAccountDTOS){
+                for (int i = 0; i < 10; i++) {
+                    String accountId;
+                    if(bankAccount instanceof SavingBankAccountDTO){
+                        accountId = ((SavingBankAccountDTO) bankAccount).getId();
+                    }else {
+                        accountId = ((CurrentBankAccountDTO) bankAccount).getId();
+                    }
+                    bankAccountService.credit(accountId, 10000 + Math.random() * 12000, "Credit");
+                    bankAccountService.debit(accountId, 1000 + Math.random() * 1200, "Debit");
+                }
+            }
         };
     }
 }
